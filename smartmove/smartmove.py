@@ -69,7 +69,7 @@ def smartmove_file(source, destination):
 
 
 @click.command()
-@click.argument('sources', required=True)
+@click.argument('sources', nargs=-1, required=True)
 @click.argument('destination', nargs=1, required=True)
 def smartmove(sources, destination):
     for source in sources:

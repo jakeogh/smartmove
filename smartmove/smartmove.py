@@ -79,13 +79,14 @@ def smartmove(sources, destination):
 
 
 if __name__ == '__main__':
-    source = sys.argv[1]
-    assert file_exists(source)
-    destination = sys.argv[2]
-    result = smartmove(source=source, destination=destination)
-    print('result:', result, '\n')
-    if not result:
-        eprint("-------------FALSE-------------- sleeping.")
-        while(1):
-            sleep(1)
+    smartmove()
+#    source = sys.argv[1]
+#    assert file_exists(source)
+#    destination = sys.argv[2]
+#    result = smartmove(source=source, destination=destination)
+#    print('result:', result, '\n')
+#    if not result:
+#        eprint("-------------FALSE-------------- sleeping.")
+#        while(1):
+#            sleep(1)
             pass

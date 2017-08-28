@@ -78,8 +78,8 @@ def smartmove(sources, destination):
 
 
 
-if __name__ == '__main__':
-    smartmove()
+#if __name__ == '__main__':
+#    smartmove()
 #    source = sys.argv[1]
 #    assert file_exists(source)
 #    destination = sys.argv[2]

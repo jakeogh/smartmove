@@ -69,7 +69,6 @@ def smartmove_file(source, destination, verbose=False):
         return False
 
 
-
 @click.command()
 @click.argument('sources', nargs=-1) #putting required=True here will miss the first file in sources
 @click.argument('destination', nargs=1)

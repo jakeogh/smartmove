@@ -73,7 +73,7 @@ def smartmove_file(source, destination, verbose=False):
 @click.command()
 @click.argument('sources', nargs=-1, required=True)
 @click.argument('destination', nargs=1, required=True)
-@click.option('verbose', required=False, default=False)
+@click.option('--verbose', required=False, default=False)
 def smartmove(sources, destination, verbose):
     for source in sources:
         assert file_exists(source)

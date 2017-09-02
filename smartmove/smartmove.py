@@ -72,7 +72,7 @@ def smartmove_file(source, destination, verbose=False):
 @click.command()
 @click.argument('sources', nargs=-1)
 @click.argument('destination', nargs=1)
-@click.option('--verbose', required=False, default=False)
+@click.option('--verbose', required=False, is_flag=True)
 def smartmove(sources, destination, verbose):
     eprint("sources:", sources)
     eprint("destination:", destination)

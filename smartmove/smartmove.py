@@ -34,7 +34,7 @@ def compare_files(source, destination, recommend_larger=True):
             return destination if source_stat.st_size > destination_stat.st_size else source
 
 
-def smartmove_file(source, destination):
+def smartmove_file(source, destination, verbose=False):
     assert file_exists(source)
     if file_exists(destination):
         assert not destination.endswith('/')
@@ -45,7 +45,7 @@ def smartmove_file(source, destination):
         if destination.endswith('/'):
             destination = destination[:-1]
         source_filename = os.path.basename(source)
-        destination = destination + '/' + source_filename
+        destination = destination + '/' + source_filename # hmmm use a new var?
         assert not dir_exists(destination)
         if file_exists(destination):
             file_to_keep = compare_files(source=source, destination=destination, recommend_larger=True)
@@ -60,6 +60,8 @@ def smartmove_file(source, destination):
                 shutil.move(source, destination)
                 return True
         else:
+            if verbose:
+                eprint(source, "->", destination)
             shutil.move(source, destination)
             return True
     else:
@@ -77,16 +79,3 @@ def smartmove(sources, destination):
         smartmove_file(source, destination)
 
 
-
-#if __name__ == '__main__':
-#    smartmove()
-#    source = sys.argv[1]
-#    assert file_exists(source)
-#    destination = sys.argv[2]
-#    result = smartmove(source=source, destination=destination)
-#    print('result:', result, '\n')
-#    if not result:
-#        eprint("-------------FALSE-------------- sleeping.")
-#        while(1):
-#            sleep(1)
-#            pass

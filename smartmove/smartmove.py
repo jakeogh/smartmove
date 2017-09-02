@@ -76,7 +76,7 @@ def smartmove_file(source, destination, verbose=False):
 def smartmove(sources, destination, verbose):
     eprint("sources:", sources)
     eprint("destination:", destination)
-    eprint("verbose", verbose
+    eprint("verbose", verbose)
     for source in sources:
         assert file_exists(source)
         smartmove_file(source, destination, verbose)

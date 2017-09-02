@@ -70,10 +70,13 @@ def smartmove_file(source, destination, verbose=False):
 
 
 @click.command()
-@click.argument('sources', nargs=-1) #putting required=True here will miss the first file in sources
+@click.argument('sources', nargs=-1)
 @click.argument('destination', nargs=1)
 @click.option('--verbose', required=False, default=False)
 def smartmove(sources, destination, verbose):
+    eprint("sources:", sources)
+    eprint("destination:", destination)
+    eprint("verbose", verbose
     for source in sources:
         assert file_exists(source)
         smartmove_file(source, destination, verbose)

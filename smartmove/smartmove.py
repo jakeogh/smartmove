@@ -8,8 +8,7 @@ from kcl.fileops import file_exists
 from kcl.dirops import dir_exists
 from kcl.printops import eprint
 
-
-def compare_files(source, destination, recommend_larger=True):
+def compare_files(source, destination, recommend_larger=True, skip_percent=False):
     assert file_exists(source)
     assert file_exists(destination)
     source_stat = os.stat(source)
@@ -28,6 +27,17 @@ def compare_files(source, destination, recommend_larger=True):
         eprint("files differ in size:")
         eprint("  source:", source_stat.st_size)
         eprint("  destination  :", destination_stat.st_size)
+
+        if skip_percent:
+            assert skip_percent < 100
+            assert skip_percent > 0
+
+            percent_difference = \
+                abs((source_stat.st_size-destination_stat.st_size) / max(source_stat.st_size, destination_stat.st_size))
+            if percent_difference < skip_percent:
+                eprint("returning destination because percent_difference: ", percent_difference, "is < skip_percent: ", skip_percent)
+                return destination
+
         if recommend_larger:
             return source if source_stat.st_size > destination_stat.st_size else destination
         else:

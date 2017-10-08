@@ -43,11 +43,11 @@ def compare_files(source, destination, recommend_larger=True, skip_percent=False
         else:
             return destination if source_stat.st_size > destination_stat.st_size else source
 
-def smartmove_file(source, destination, verbose=False):
+def smartmove_file(source, destination, verbose=False, skip_percent=False):
     assert file_exists(source)
     if file_exists(destination):
         assert not destination.endswith('/')
-        file_to_keep = compare_files(source=source, destination=destination)
+        file_to_keep = compare_files(source=source, destination=destination, skip_percent=skip_percent)
         eprint("file_to_keep:", file_to_keep)
         return False
     elif dir_exists(destination):
@@ -57,7 +57,7 @@ def smartmove_file(source, destination, verbose=False):
         destination = destination + '/' + source_filename # hmmm use a new var?
         assert not dir_exists(destination)
         if file_exists(destination):
-            file_to_keep = compare_files(source=source, destination=destination, recommend_larger=True)
+            file_to_keep = compare_files(source=source, destination=destination, recommend_larger=True, skip_percent=skip_percent)
             eprint("file_to_keep:", file_to_keep)
             if file_to_keep == destination:
                 eprint("keeping destination file, no need to mv, just rm source")

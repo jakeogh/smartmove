@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import sys
 import os
 import shutil
 import click
@@ -43,7 +42,7 @@ def compare_files(source, destination, recommend_larger=True, skip_percent=False
         else:
             return destination if source_stat.st_size > destination_stat.st_size else source
 
-def smartmove_file(source, destination, verbose=False, skip_percent=False):
+def smartmove_file(source, destination, makedirs, verbose=False, skip_percent=False):
     eprint("source:", source)
     eprint("destination  :", destination)
     assert file_exists(source)
@@ -73,20 +72,24 @@ def smartmove_file(source, destination, verbose=False, skip_percent=False):
         else:
             if verbose:
                 eprint(source, "->", destination)
+            destination_folder = os.path.dirname(source)
+            if makedirs:
+                os.makedirs(destination_folder, exist_ok=True)
             shutil.move(source, destination)
             return True
     else:
         eprint("destination:", destination, "is not a file or directory, exiting.")
-        return False
+        raise FileNotFoundError
 
 
 @click.command()
 @click.argument('sources', nargs=-1)
 @click.argument('destination', nargs=1)
 @click.option('--verbose', required=False, is_flag=True)
-def smartmove(sources, destination, verbose):
+@click.option('--makedirs', required=False, is_flag=True)
+def smartmove(sources, destination, verbose, makedirs):
     for source in sources:
         assert file_exists(source)
-        smartmove_file(source, destination, verbose)
+        smartmove_file(source=source, destination=destination, verbose=verbose, makedirs=makedirs)
 
 

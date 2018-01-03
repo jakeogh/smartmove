@@ -44,6 +44,8 @@ def compare_files(source, destination, recommend_larger=True, skip_percent=False
             return destination if source_stat.st_size > destination_stat.st_size else source
 
 def smartmove_file(source, destination, verbose=False, skip_percent=False):
+    eprint("source:", source)
+    eprint("destination  :", destination)
     assert file_exists(source)
     if file_exists(destination):
         assert not destination.endswith('/')

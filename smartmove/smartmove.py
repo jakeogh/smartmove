@@ -9,12 +9,12 @@ from kcl.dirops import dir_exists
 from kcl.printops import eprint
 
 def compare_files(source, destination, recommend_larger=True, skip_percent=False):
+    eprint("source:", source)
+    eprint("destination  :", destination)
     assert file_exists(source)
     assert file_exists(destination)
     source_stat = os.stat(source)
     destination_stat = os.stat(destination)
-    eprint("source:", source)
-    eprint("destination  :", destination)
     #eprint("source_stat:", source_stat)
     #eprint("destination_stat:", destination_stat)
     if source_stat.st_size == destination_stat.st_size:

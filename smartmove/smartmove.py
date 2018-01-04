@@ -52,7 +52,7 @@ def smartmove_file(source, destination, makedirs, verbose=False, skip_percent=Fa
         eprint("file_to_keep:", file_to_keep)
         return False
     elif dir_exists(destination):
-        if destination.endswith('/'):
+        if destination.endswith('/'): # should be fixed with a decorator
             destination = destination[:-1]
         source_filename = os.path.basename(source)
         destination = destination + '/' + source_filename # hmmm use a new var?
@@ -72,14 +72,18 @@ def smartmove_file(source, destination, makedirs, verbose=False, skip_percent=Fa
         else:
             if verbose:
                 eprint(source, "->", destination)
-            destination_folder = os.path.dirname(source)
-            if makedirs:
-                os.makedirs(destination_folder, exist_ok=True)
             shutil.move(source, destination)
             return True
     else:
-        eprint("destination:", destination, "is not a file or directory, exiting.")
-        raise FileNotFoundError
+        destination_folder = os.path.dirname(destination)
+        if makedirs:
+            os.makedirs(destination_folder, exist_ok=True)
+            if verbose:
+                eprint(source, "->", destination)
+            shutil.move(source, destination)
+        else:
+            eprint("destination:", destination, "is not a file or directory, exiting.")
+            raise FileNotFoundError
 
 
 @click.command()

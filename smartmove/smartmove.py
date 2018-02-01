@@ -7,6 +7,7 @@ from kcl.fileops import file_exists
 from kcl.dirops import dir_exists
 from kcl.printops import eprint
 
+
 def compare_files(source, destination, recommend_larger=True, skip_percent=False):
     eprint("source:", source)
     eprint("destination  :", destination)

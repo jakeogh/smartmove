@@ -7,6 +7,7 @@ from kcl.fileops import file_exists
 from kcl.dirops import dir_exists
 from kcl.printops import eprint
 
+JUNK = '/home/user/_youtube/sources_delme/youtube/'
 
 def compare_files(source, destination, recommend_larger=True, skip_percent=False):
     eprint("source     :", source)
@@ -50,8 +51,18 @@ def smartmove_file(source, destination, makedirs, verbose=False, skip_percent=Fa
     assert file_exists(source)
     if file_exists(destination):
         assert not destination.endswith('/')
-        file_to_keep = compare_files(source=source, destination=destination, skip_percent=skip_percent)
+        file_to_keep = compare_files(source=source, destination=destination, recommend_larger=True, skip_percent=skip_percent)
         eprint("file_to_keep:", file_to_keep)
+        if file_to_keep == destination:
+            eprint("the destination file is being kept, so need to delete the source since it's not being moved")
+            shutil.move(source, JUNK)
+        elif file_to_keep == source:
+            eprint("the source:", source, "is being kept, so need to move it to overwrite the destination")
+            shutil.move(source, destination)
+        else:
+            eprint("file_to_keep:", file_to_keep, "does not match the source or destination, that's a bug")
+            exit(1)
+
         return False
     elif dir_exists(destination):
         if destination.endswith('/'): # should be fixed with a decorator

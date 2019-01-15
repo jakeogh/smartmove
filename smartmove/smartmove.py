@@ -55,7 +55,11 @@ def smartmove_file(source, destination, makedirs, verbose=False, skip_percent=Fa
         eprint("file_to_keep:", file_to_keep)
         if file_to_keep == destination:
             eprint("the destination file is being kept, so need to delete the source since it's not being moved")
-            shutil.move(source, JUNK)  # https://bugs.python.org/issue26791
+            try:
+                shutil.move(source, JUNK)  # https://bugs.python.org/issue26791
+            except OSError:
+                os.unlink(source)
+
         elif file_to_keep == source:
             eprint("the source:", source, "is being kept, so need to move it to overwrite the destination")
             shutil.move(source, destination)

@@ -9,6 +9,7 @@ from kcl.printops import eprint
 
 JUNK = '/home/user/_youtube/sources_delme/youtube/'
 
+
 def compare_files(source, destination, recommend_larger=True, skip_percent=False):
     eprint("source     :", source)
     eprint("destination:", destination)
@@ -43,6 +44,7 @@ def compare_files(source, destination, recommend_larger=True, skip_percent=False
             return source if source_stat.st_size > destination_stat.st_size else destination
         else:
             return destination if source_stat.st_size > destination_stat.st_size else source
+
 
 def smartmove_file(source, destination, makedirs, verbose=False, skip_percent=False):
     #eprint("\n")

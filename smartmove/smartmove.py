@@ -117,4 +117,3 @@ def smartmove(sources, destination, verbose, makedirs):
         assert file_exists(source)
         smartmove_file(source=source, destination=destination, verbose=verbose, makedirs=makedirs)
 
-

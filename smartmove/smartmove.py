@@ -4,7 +4,7 @@ import os
 import shutil
 import click
 from kcl.fileops import file_exists
-from kcl.dirops import dir_exists
+from kcl.dirops import path_is_dir
 from kcl.printops import eprint
 
 JUNK = '/home/user/_youtube/sources_delme/youtube/'
@@ -70,12 +70,12 @@ def smartmove_file(source, destination, makedirs, verbose=False, skip_percent=Fa
             exit(1)
 
         return False
-    elif dir_exists(destination):
+    elif path_is_dir(destination):
         if destination.endswith('/'): # should be fixed with a decorator
             destination = destination[:-1]
         source_filename = os.path.basename(source)
         destination = destination + '/' + source_filename # hmmm use a new var?
-        assert not dir_exists(destination)
+        assert not path_is_dir(destination)
         if file_exists(destination):
             file_to_keep = compare_files(source=source, destination=destination, recommend_larger=True, skip_percent=skip_percent)
             eprint("file_to_keep:", file_to_keep)

@@ -17,7 +17,7 @@ def ffmpeg_file_is_corrupt(file, write_verification=False):
     command += " "
     command += file
     try:
-        run_command(command)
+        run_command(command, verbose=True)
         if write_verification:
             eprint("could write verification file now, need hash")
     except CalledProcessError:

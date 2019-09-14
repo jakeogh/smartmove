@@ -2,15 +2,30 @@
 
 import os
 import shutil
+from subprocess import CalledProcessError
 import click
 from kcl.fileops import file_exists
 from kcl.dirops import path_is_dir
+from kcl.commandops import run_command
 from kcl.printops import eprint
 
 JUNK = '/home/user/_youtube/sources_delme/youtube/'
 
 
-def compare_files(source, destination, recommend_larger=True, skip_percent=False):
+def ffmpeg_file_is_corrupt(file, write_verification=False):
+    command = "/home/cfg/media/ffmpeg/exit_on_first_error_found"
+    command += " "
+    command += file
+    try:
+        run_command(command)
+        if write_verification:
+            eprint("could write verification file now, need hash")
+    except CalledProcessError:
+        return True
+    return False
+
+
+def compare_files_by_size(source, destination, recommend_larger=True, skip_percent=False):
     eprint("source     :", source)
     eprint("destination:", destination)
     assert file_exists(source)
@@ -22,28 +37,25 @@ def compare_files(source, destination, recommend_larger=True, skip_percent=False
     if source_stat.st_size == destination_stat.st_size:
         eprint("files are the same size")
         return destination
-    #elif source_stat.st_size > destination_stat.st_size:
-    #    eprint("the source file is larger:")
-    #else source_stat.st_size < destination_stat.st_size:
+
+    eprint("files differ in size:")
+    eprint("  source:", source_stat.st_size)
+    eprint("  destination  :", destination_stat.st_size)
+
+    if skip_percent:
+        assert skip_percent < 100
+        assert skip_percent > 0
+
+        percent_difference = \
+            abs((source_stat.st_size-destination_stat.st_size) / max(source_stat.st_size, destination_stat.st_size))
+        if percent_difference < skip_percent:
+            eprint("returning destination because percent_difference: ", percent_difference, "is < skip_percent: ", skip_percent)
+            return destination
+
+    if recommend_larger:
+        return source if source_stat.st_size > destination_stat.st_size else destination
     else:
-        eprint("files differ in size:")
-        eprint("  source:", source_stat.st_size)
-        eprint("  destination  :", destination_stat.st_size)
-
-        if skip_percent:
-            assert skip_percent < 100
-            assert skip_percent > 0
-
-            percent_difference = \
-                abs((source_stat.st_size-destination_stat.st_size) / max(source_stat.st_size, destination_stat.st_size))
-            if percent_difference < skip_percent:
-                eprint("returning destination because percent_difference: ", percent_difference, "is < skip_percent: ", skip_percent)
-                return destination
-
-        if recommend_larger:
-            return source if source_stat.st_size > destination_stat.st_size else destination
-        else:
-            return destination if source_stat.st_size > destination_stat.st_size else source
+        return destination if source_stat.st_size > destination_stat.st_size else source
 
 
 def smartmove_file(source, destination, makedirs, verbose=False, skip_percent=False):
@@ -53,8 +65,22 @@ def smartmove_file(source, destination, makedirs, verbose=False, skip_percent=Fa
     assert file_exists(source)
     if file_exists(destination):
         assert not destination.endswith('/')
-        file_to_keep = compare_files(source=source, destination=destination, recommend_larger=True, skip_percent=skip_percent)
-        eprint("file_to_keep:", file_to_keep)
+        source_corrupt = ffmpeg_file_is_corrupt(source)
+        destination_corrupt = ffmpeg_file_is_corrupt(destination)
+        if source_corrupt and destination_corrupt:
+            eprint("source and destination are corrupt according to ffmpeg, relying on file size instead")
+            file_to_keep = compare_files_by_size(source=source, destination=destination, recommend_larger=True, skip_percent=skip_percent)
+            eprint("file_to_keep:", file_to_keep)
+        elif source_corrupt:
+            file_to_keep = destination
+            eprint("source is corrupt, keeping destination")  # bug what if destination is much smaller?
+        elif destination_corrupt:
+            file_to_keep = source
+            eprint("destination is corrupt, keeping source")  # bug what if source is much smaller?
+        else:   # neither are corrupt...
+            file_to_keep = compare_files_by_size(source=source, destination=destination, recommend_larger=True, skip_percent=skip_percent)
+            eprint("did size comparison, file_to_keep:", file_to_keep)
+
         if file_to_keep == destination:
             eprint("the destination file is being kept, so need to delete the source since it's not being moved")
             try:
@@ -79,7 +105,7 @@ def smartmove_file(source, destination, makedirs, verbose=False, skip_percent=Fa
         destination = destination + '/' + source_filename # hmmm use a new var?
         assert not path_is_dir(destination)
         if file_exists(destination):
-            file_to_keep = compare_files(source=source, destination=destination, recommend_larger=True, skip_percent=skip_percent)
+            file_to_keep = compare_files_by_size(source=source, destination=destination, recommend_larger=True, skip_percent=skip_percent)
             eprint("file_to_keep:", file_to_keep)
             if file_to_keep == destination:
                 eprint("keeping destination file, no need to mv, just rm source")

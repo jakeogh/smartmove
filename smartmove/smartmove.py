@@ -15,7 +15,7 @@ JUNK = '/home/user/_youtube/sources_delme/youtube/'
 def ffmpeg_file_is_corrupt(file, write_verification=False):
     command = "/home/cfg/media/ffmpeg/exit_on_first_error_found"
     command += " "
-    command += file
+    command += os.fsdecode(file)
     try:
         run_command(command, verbose=True)
         if write_verification:

@@ -8,6 +8,10 @@ from kcl.fileops import file_exists
 from kcl.dirops import path_is_dir
 from kcl.commandops import run_command
 from kcl.printops import eprint
+from classify.classify import classify
+from icecream import ic
+from shutil import get_terminal_size
+ic.lineWrapWidth, _ = get_terminal_size((80, 20))
 
 JUNK = '/home/user/_youtube/sources_delme/youtube/'
 
@@ -39,8 +43,8 @@ def compare_files_by_size(source, destination, recommend_larger=True, skip_perce
         return destination
 
     eprint("files differ in size:")
-    eprint("  source:", source_stat.st_size)
-    eprint("  destination  :", destination_stat.st_size)
+    eprint("  source     :", source_stat.st_size)
+    eprint("  destination:", destination_stat.st_size)
 
     if skip_percent:
         assert skip_percent < 100
@@ -65,21 +69,27 @@ def smartmove_file(source, destination, makedirs, verbose=False, skip_percent=Fa
     assert file_exists(source)
     if file_exists(destination):
         assert not destination.endswith('/')
-        source_corrupt = ffmpeg_file_is_corrupt(source)
-        destination_corrupt = ffmpeg_file_is_corrupt(destination)
-        if source_corrupt and destination_corrupt:
-            eprint("source and destination are corrupt according to ffmpeg, relying on file size instead")
+        source_classification = classify(source)
+
+        if source_classification == 'media':
+            source_corrupt = ffmpeg_file_is_corrupt(source)
+            destination_corrupt = ffmpeg_file_is_corrupt(destination)
+            if source_corrupt and destination_corrupt:
+                eprint("source and destination are corrupt according to ffmpeg, relying on file size instead")
+                file_to_keep = compare_files_by_size(source=source, destination=destination, recommend_larger=True, skip_percent=skip_percent)
+                eprint("file_to_keep:", file_to_keep)
+            elif source_corrupt:
+                file_to_keep = destination
+                eprint("source is corrupt, keeping destination")  # bug what if destination is much smaller?
+            elif destination_corrupt:
+                file_to_keep = source
+                eprint("destination is corrupt, keeping source")  # bug what if source is much smaller?
+            else:   # neither are corrupt...
+                file_to_keep = compare_files_by_size(source=source, destination=destination, recommend_larger=True, skip_percent=skip_percent)
+                eprint("did size comparison, file_to_keep:", file_to_keep)
+        else:
             file_to_keep = compare_files_by_size(source=source, destination=destination, recommend_larger=True, skip_percent=skip_percent)
-            eprint("file_to_keep:", file_to_keep)
-        elif source_corrupt:
-            file_to_keep = destination
-            eprint("source is corrupt, keeping destination")  # bug what if destination is much smaller?
-        elif destination_corrupt:
-            file_to_keep = source
-            eprint("destination is corrupt, keeping source")  # bug what if source is much smaller?
-        else:   # neither are corrupt...
-            file_to_keep = compare_files_by_size(source=source, destination=destination, recommend_larger=True, skip_percent=skip_percent)
-            eprint("did size comparison, file_to_keep:", file_to_keep)
+            eprint("(non media) did size comparison, file_to_keep:", file_to_keep)
 
         if file_to_keep == destination:
             eprint("the destination file is being kept, so need to delete the source since it's not being moved")
@@ -87,6 +97,7 @@ def smartmove_file(source, destination, makedirs, verbose=False, skip_percent=Fa
                 shutil.move(source, JUNK)  # https://bugs.python.org/issue26791
             except OSError:
                 os.unlink(source)
+                eprint("unlinked:", source)
             #except IsADirectoryError:
             #    os.unlink(source)
 
@@ -98,6 +109,7 @@ def smartmove_file(source, destination, makedirs, verbose=False, skip_percent=Fa
             exit(1)
 
         return False
+
     elif path_is_dir(destination):
         if destination.endswith('/'): # should be fixed with a decorator
             destination = destination[:-1]

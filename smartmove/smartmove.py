@@ -5,6 +5,7 @@ import shutil
 from subprocess import CalledProcessError
 import click
 from kcl.fileops import file_exists
+from kcl.fileops import empty_file
 from kcl.dirops import path_is_dir
 from kcl.commandops import run_command
 from kcl.printops import eprint
@@ -90,6 +91,11 @@ def smartmove_file(source, destination, makedirs, verbose=False, skip_percent=Fa
         else:
             file_to_keep = compare_files_by_size(source=source, destination=destination, recommend_larger=True, skip_percent=skip_percent)
             eprint("(non media) did size comparison, file_to_keep:", file_to_keep)
+
+
+        if empty_file(file_to_keep):
+            assert empty_file(source)
+            assert empty_file(destination)
 
         if file_to_keep == destination:
             eprint("the destination file is being kept, so need to delete the source since it's not being moved")

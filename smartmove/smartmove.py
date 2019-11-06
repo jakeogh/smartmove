@@ -31,8 +31,8 @@ def ffmpeg_file_is_corrupt(file, write_verification=False):
 
 
 def compare_files_by_size(source, destination, recommend_larger=True, skip_percent=False):
-    eprint("source     :", source)
-    eprint("destination:", destination)
+    #ic(source)
+    #ic(destination)
     assert file_exists(source)
     assert file_exists(destination)
     source_stat = os.stat(source)
@@ -52,9 +52,10 @@ def compare_files_by_size(source, destination, recommend_larger=True, skip_perce
         assert skip_percent > 0
 
         percent_difference = \
-            abs((source_stat.st_size-destination_stat.st_size) / max(source_stat.st_size, destination_stat.st_size))
+            abs((source_stat.st_size - destination_stat.st_size) / max(source_stat.st_size, destination_stat.st_size))
         if percent_difference < skip_percent:
             eprint("returning destination because percent_difference: ", percent_difference, "is < skip_percent: ", skip_percent)
+            assert False
             return destination
 
     if recommend_larger:

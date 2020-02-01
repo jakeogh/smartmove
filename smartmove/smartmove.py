@@ -33,8 +33,8 @@ def ffmpeg_file_is_corrupt(file, write_verification=False):
 def compare_files_by_size(source, destination, recommend_larger=True, skip_percent=False):
     #ic(source)
     #ic(destination)
-    assert file_exists(source)
-    assert file_exists(destination)
+    assert path_is_file(source)
+    assert path_is_file(destination)
     source_stat = os.stat(source)
     destination_stat = os.stat(destination)
     #eprint("source_stat:", source_stat)
@@ -68,8 +68,8 @@ def smartmove_file(source, destination, makedirs, verbose=False, skip_percent=Fa
     #eprint("\n")
     eprint("source     :", source)
     eprint("destination:", destination)
-    assert file_exists(source)
-    if file_exists(destination):
+    assert path_is_file(source)
+    if path_is_file(destination):
         assert not destination.endswith('/')
         source_classification = classify(source)
 
@@ -123,7 +123,7 @@ def smartmove_file(source, destination, makedirs, verbose=False, skip_percent=Fa
         source_filename = os.path.basename(source)
         destination = destination + '/' + source_filename # hmmm use a new var?
         assert not path_is_dir(destination)
-        if file_exists(destination):
+        if path_is_file(destination):
             file_to_keep = compare_files_by_size(source=source, destination=destination, recommend_larger=True, skip_percent=skip_percent)
             eprint("file_to_keep:", file_to_keep)
             if file_to_keep == destination:
@@ -159,6 +159,6 @@ def smartmove_file(source, destination, makedirs, verbose=False, skip_percent=Fa
 @click.option('--makedirs', required=False, is_flag=True)
 def smartmove(sources, destination, verbose, makedirs):
     for source in sources:
-        assert file_exists(source)
+        assert path_is_file(source)
         smartmove_file(source=source, destination=destination, verbose=verbose, makedirs=makedirs)
 

@@ -159,6 +159,7 @@ def smartmove_file(source, destination, makedirs, verbose=False, skip_percent=Fa
 @click.option('--makedirs', required=False, is_flag=True)
 def smartmove(sources, destination, verbose, makedirs):
     for source in sources:
+        ic(source)
         assert path_is_file(source)
         smartmove_file(source=source, destination=destination, verbose=verbose, makedirs=makedirs)
 

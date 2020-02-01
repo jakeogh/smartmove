@@ -4,7 +4,7 @@ import os
 import shutil
 from subprocess import CalledProcessError
 import click
-from kcl.fileops import file_exists
+from kcl.fileops import path_is_file
 from kcl.fileops import empty_file
 from kcl.dirops import path_is_dir
 from kcl.commandops import run_command

@@ -71,7 +71,7 @@ def smartmove_file(source, destination, makedirs, verbose=False, skip_percent=Fa
     eprint("destination:", destination)
     assert path_is_file(source)
     if path_is_file(destination):
-        assert not destination.endswith('/')
+        #assert not destination.as_posix().endswith('/')
         source_classification = classify(source)
 
         if source_classification == 'media':

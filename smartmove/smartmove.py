@@ -4,6 +4,7 @@ import os
 import shutil
 from subprocess import CalledProcessError
 import click
+from pathlib import Path
 from kcl.fileops import path_is_file
 from kcl.fileops import empty_file
 from kcl.dirops import path_is_dir
@@ -160,6 +161,7 @@ def smartmove_file(source, destination, makedirs, verbose=False, skip_percent=Fa
 def smartmove(sources, destination, verbose, makedirs):
     for source in sources:
         ic(source)
+        source = Path(source)
         assert path_is_file(source)
         smartmove_file(source=source, destination=destination, verbose=verbose, makedirs=makedirs)
 

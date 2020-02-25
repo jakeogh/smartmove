@@ -162,6 +162,7 @@ def smartmove(sources, destination, verbose, makedirs):
     for source in sources:
         ic(source)
         source = Path(source)
+        destination = Path(destination)
         assert path_is_file(source)
         smartmove_file(source=source, destination=destination, verbose=verbose, makedirs=makedirs)
 
